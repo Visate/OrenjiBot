@@ -1,4 +1,11 @@
 {
+  "name": "OrenjiBot",
+  "version": "0.1",
+  "description": "A management bot created for the Orenji Tea Time guild",
+  "main": "index.js",
+  "repository": "https://github.com/Visate/OrenjiBot.git",
+  "author": "Richard Gan <richard@designedbymajor.ca>",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^2.0.1",
     "common-tags": "^1.4.0",

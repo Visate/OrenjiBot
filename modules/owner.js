@@ -4,7 +4,7 @@ module.exports = (client) => {
   client.registerCommand("eval",
 
   // function of eval
-  (msg, args) => {
+  (msg) => {
 
     try {
 
@@ -16,7 +16,7 @@ module.exports = (client) => {
 
     catch (err) {
 
-      return `Error: ${cleanText(err)}`
+      return `Error: ${cleanText(err)}`;
 
     }
 

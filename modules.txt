@@ -5,3 +5,4 @@
 # put General/commands or General/commands.js into this file.
 
 owner
+log

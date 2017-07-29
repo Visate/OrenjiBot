@@ -17,7 +17,10 @@ const client = new Eris.CommandClient(
 
       TYPING_START: true,
 
-    }
+    },
+
+    defaultImageFormat: "png",
+    defaultImageSize: 1024
 
   },
 

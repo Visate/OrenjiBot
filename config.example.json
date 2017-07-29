@@ -1,4 +1,7 @@
 {
   "discordToken": "",
-  "prefixes": []
+  "prefixes": [],
+  "guildID": "",
+  "modChannelID": [],
+  "logChannelID": ""
 }

@@ -6,25 +6,36 @@ const config = require("./config");
 
 // Intiialize the client
 const client = new Eris.CommandClient(
+
   // Discord token
   config.discordToken,
 
   // Client options
   {
+
     disableEvents: {
+
       TYPING_START: true,
+
     }
+
   },
 
   // Command options
   {
+
     description: "A bot made by Visate#7752 (ID: 97198953430257664)\n\nPM @Visate#7752 if you have any suggestions for the bot!",
     owner: "",
     prefix: config.prefixes,
+
     defaultCommandOptions: {
+
       caseInsensitive: true,
+
     }
+
   }
+
 );
 
 // Attach the config to the client

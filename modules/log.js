@@ -167,7 +167,7 @@ module.exports = (client) => {
   // User name change
   client.on("userUpdate", (user, oldUser) => {
 
-    if (user.username === oldUser.username) return;
+    if (!oldUser || user) return;
 
     if (client.guilds.get(client.config.guildID).members.get(user.id)) {
 

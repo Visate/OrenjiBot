@@ -28,7 +28,7 @@ const client = new Eris.CommandClient(
   // Command options
   {
 
-    description: "A bot made by Visate#7752 (ID: 97198953430257664)\n\nPM @Visate#7752 if you have any suggestions for the bot!",
+    description: "A bot made by Visate#7752 (ID: 97198953430257664) and Zero#0456 (ID: 96140677322141696)\n\nPM them if you have any suggestions for the bot!",
     owner: "",
     prefix: config.prefixes,
 

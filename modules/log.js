@@ -1,134 +1,211 @@
 module.exports = (client) => {
     
-    //server logging into logging channel 
+  // Ready event
+  client.on("ready", () => {
+
+    client.log(`Ready! Logged in to Discord as ${client.user.username}#${client.user.discriminator} (${client.user.id}).`);
+    client.log("------------------------------");
+    client.log("");
+
+    if (client.config.logChannelID) {
+
+      client.createMessage(client.config.logChannelID, {
+
+        embed: {
+
+          author: {
+
+            name: `${client.user.username}#${client.user.discriminator} (${client.user.id})`,
+            icon_url: client.user.staticAvatarURL
+
+          },
+
+          footer: {
+
+            text: "Bot Online",
+
+          },
+
+          timestamp: new Date(),
+          color: 8978176, // #88FF00, light green
+          type: "rich"
+
+        }
+
+      }).catch((err) => client.error(`Failed to create log: ${err}`));
+
+    }
+
+  });
+
+  // Server logging into logging channel 
  
-    //user join
-    client.on("guildMemberAdd", (guild, member) => {
+  // User join
+  client.on("guildMemberAdd", (guild, member) => {
+
+    if (guild.id === client.config.guildID) {
+   
+      if (client.config.logChannelID) {
  
-        if(guild === client.config.guildID) {
+        client.createMessage(client.config.logChannelID, {
+    
+          embed: {
+    
+            author: {
+
+              name: `${member.username}#${member.discriminator} (${member.id})`,
+              icon_url: member.staticAvatarURL
+    
+            },
+    
+            footer: {
+
+              text: "User Joined"
+
+            },
+
+            timestamp: new Date(),
+            color: 8978176, // #88FF00, lightgreen
+            type: "rich"
+    
+          }
+
+        }).catch((err) => client.error(`Failed to create log: ${err}`));
+    
+      }
+
+      client.log(`${member.username}#${member.discriminator} (${member.id}) joined the server.`);
+
+    }
         
-            if(client.config.logChannelID) {
-    
-                client.createMessage(client.config.logChannelID, {
-    
-                    embed:{
-    
-                    author:{
-    
-                            name: `${member.username}#${member.discriminator}`,
-    
-                            icon_url: member.user.dynamicAvatarURL("jpg", 512)
-    
-                        },
-    
-                        description: "User joined",
-    
-                        timestamp: new Date(),
-    
-                    }
+  });
 
-                }).catch((err) => client.error(`Failed to create log: ${err}`));
-    
-            }
-        }
-        
-    });
-
-    //user leave 
-    client.on("guildMemberRemove", (guild, member) => {
+  // User leave 
+  client.on("guildMemberRemove", (guild, member) => {
  
-        if(guild === client.config.guildID) {
+    if (guild.id === client.config.guildID) {
 
-            if(client.config.logChannelID) {
+      if (client.config.logChannelID) {
     
-                client.createMessage(client.config.logChannelID, {
+        client.createMessage(client.config.logChannelID, {
     
-                    embed:{
+          embed: {
     
-                        author:{
+            author: {
     
-                            name: `${member.username}#${member.discriminator}`,
+              name: `${member.username}#${member.discriminator} (${member.id})`,
+              icon_url: member.staticAvatarURL ? member.staticAvatarURL : null
     
-                            icon_url: member.user.dynamicAvatarURL("jpg", 512)
-    
-                        },
-    
-                        description: "User left",
-    
-                        timestamp: new Date(),
-    
-                    }
-    
-                }).catch((err) => client.error(`Failed to create log: ${err}`));
-    
-            }
-        }
+            },
 
-    });
+            footer: {
+
+              text: "User Left"
+
+            },
+
+            timestamp: new Date(),
+            color: 16755200, // #FFAA00, orange
+            type: "rich"
+    
+          }
+    
+        }).catch((err) => client.error(`Failed to create log: ${err}`));
+    
+      }
+
+      client.log(`${member.username}#${member.discriminator} (${member.id}) left the server.`);
+
+    }
+
+  });
  
-    //user nickname change
+  // User nickname change
+  client.on("guildMemberUpdate", (guild, member, oldMember) => {
  
-    client.on("guildMemberUpdate", (guild, member, oldMember) => {
+    if (oldMember.nick === member.nick) return;
+
+    if (guild.id === client.config.guildID) {
+
+      if (client.config.logChannelID) {
+  
+        client.createMessage(client.config.logChannelID, {
+  
+          embed: {
+    
+            author: {
+    
+              name: `${member.username}#${member.discriminator} (${member.id})`,
+              icon_url: member.staticAvatarURL
+    
+            },
+    
+            description: `Nickname was changed from ${oldMember.nick} to ${member.nick}`,
+
+            footer: {
+
+              text: "Nickname Change"
+
+            },
+
+            timestamp: new Date(),
+            color: 52479, // #00CCFF, lightblue
+            type: "rich"
+    
+          }
+    
+        }).catch((err) => client.error(`Failed to create log: ${err}`));
+    
+      }
+
+      client.log(`${member.username}#${member.discriminator}'s nickname changed from ${oldMember.nick} to ${member.nick}`);
+
+    }
+
+  });
  
-        if(guild === client.config.guildID) {
+  // User name change
+  client.on("userUpdate", (user, oldUser) => {
 
-            if(client.config.logChannelID) {
-    
-                client.createMessage(client.config.logChannelID, {
-    
-                    embed:{
-    
-                        author:{
-    
-                            name: `${member.username}#${member.discriminator}`,
-    
-                            icon_url: member.user.dynamicAvatarURL("jpg", 512)
-    
-                        },
-    
-                        description: `${member.username}#${member.discriminator}'s nickname has been changed from ${oldMember.nick} to ${member.nick}`,
-    
-                        timestamp: new Date(),
-    
-                    }
-    
-                }).catch((err) => client.error(`Failed to create log: ${err}`));
-    
-            }
-        }
+    if (user.username === oldUser.username) return;
 
-    });
- 
-    //user name change
-    client.on("userUpdate", (guild, user, oldUser) => {
- 
-        if(guild === client.config.guildID) {
+    if (client.guilds.get(client.config.guildID).members.get(user.id)) {
 
-            if(client.config.logChannelID) {
+      if (client.config.logChannelID) {
     
-                client.createMessage(client.config.logChannelID, {
+        client.createMessage(client.config.logChannelID, {
     
-                    embed:{
+          embed: {
 
-                        author:{
+            author: {
     
-                            name: `${user.username}#${user.discriminator}`,
-
-                            icon_url: user.user.dynamicAvatarURL("jpg", 512)
+              name: `${user.username}#${user.discriminator} (${user.id})`,
+              icon_url: user.staticAvatarURL
     
-                        },
+            },
     
-                        description: `${oldUser.username} has changed to ${user.username}#${user.discriminator}`,
+            description: `Name was changed from ${oldUser.username}#${oldUser.discriminator}`,
                         
-                        timestamp: new Date(),
+            footer: {
+
+              text: "Name Change"
+
+            },
+
+            timestamp: new Date(),
+            color: 52479, // #00CCFF, lightblue
+            type: "rich"
+
+          }
     
-                    }
+        }).catch((err) => client.error(`Failed to create log: ${err}`));
     
-                }).catch((err) => client.error(`Failed to create log: ${err}`));
-    
-            }
-        }
+      }
+
+      client.log(`ID ${user.id}: Name changed from ${oldUser.username}#${oldUser.discriminator} to ${user.username}#${user.discriminator}`);
+
+    }
         
-    });
+  });
 
 };

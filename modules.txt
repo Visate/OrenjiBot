@@ -1,8 +1,0 @@
-# This file lists any modules that are to be loaded by the client.
-# Any line starting with # is ignored.
-# Place the file path after ./modules into this file.
-# ex. if your modules file is in ./modules/General/commands.js
-# put General/commands or General/commands.js into this file.
-
-owner
-log

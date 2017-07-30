@@ -2,20 +2,26 @@ module.exports = (client) => {
 
   client.on("messageReactionAdd", (message, emoji, userID) => {
 
-    if (message.guild.id === client.config.guildID) {
+  message.channel.getMessage(message.id).then(msg => {
+    client.log(`${message.id}`);
+    
+    if (msg.guild.id === client.config.guildID) {
 
-      if (message.channel.id !== client.config.starboardChannelID) {
+      if (msg.channel.id !== client.config.starboardChannelID) {
 
-        if (emoji.name === ":star:" && emoji.id === null) {
+        if (emoji.name === "⭐" && emoji.id === null) {
 
-          let user = message.member;
-
+          let user = msg.member;
+          let db = client.getDatabase();
           // Open database and create starboard table if it does not exist
-          client.getDatabase.run("CREATE TABLE IF NOT EXISTS starboard (MessageId INTEGER)")
-
+          db.run("CREATE TABLE IF NOT EXISTS starboard (MessageId INTEGER)", [], (err) =>{
+            client.log(`Attempted to create table`);
+          });
+          
+          client.log(`${msg.id}`)
           // Check the database for the message id
-          .get("SELECT MessageId id FROM starboard WHERE MessageId = ?", message.id, (err, row) => {
-
+          db.get("SELECT MessageId id FROM starboard WHERE MessageId = ?", message.id, (err, row) => {
+            client.log(`${row}`);
             if (err) {
 
               client.error(`Failed to load database: ${err}`);
@@ -23,7 +29,8 @@ module.exports = (client) => {
             }
 
             // If the message id does not exist in the database, add it, and create a new post in starboard
-            if (row === null) {
+            if (row == null) {
+              client.log(`Attempted to add to starboard`);
               client.createMessage(client.config.starboardChannelID, {
 
                 embed: {
@@ -35,7 +42,7 @@ module.exports = (client) => {
 
                   },
 
-                  description: message.content,
+                  description: msg.content,
 
                   footer: {
 
@@ -51,7 +58,7 @@ module.exports = (client) => {
               
               }).catch((err) => client.error(`Failed to add post to starboard: ${err}`));
 
-              client.getDatabase.run("INSERT INTO starboard MessageID VALUES ?", message.id, (err) => {
+              db.run("INSERT INTO starboard MessageID VALUES ?", message.id, (err) => {
 
                 if (err) {
 
@@ -70,7 +77,7 @@ module.exports = (client) => {
       }
 
     }
-    
+  })  
   });
 
 }

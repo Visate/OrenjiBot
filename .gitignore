@@ -1,6 +1,9 @@
 # Config
 config.json
 
+# starboard test files
+modules/test
+
 # Logs
 logs
 *.log

@@ -31,7 +31,7 @@ module.exports = (client) => {
 
     requirements: {
 
-      userIDs: [ "97198953430257664" ],
+      userIDs: [ "97198953430257664", "96140677322141696" ],
 
     }
 

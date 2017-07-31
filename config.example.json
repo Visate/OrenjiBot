@@ -3,6 +3,9 @@
   "prefixes": [],
 
   "databaseLocation": "",
+
+  "veteranRoleIDS": [],
+
   "guildID": "",
   "modChannelIDs": [],
   "starboardChannelID": "",

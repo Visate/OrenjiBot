@@ -4,6 +4,9 @@ config.json
 # starboard test files
 modules/test
 
+#VSC folder
+.vscode
+
 # Logs
 logs
 *.log

@@ -44,7 +44,7 @@ module.exports = (client) => {
 
                       },
 
-                      description: msg.content,
+                      description: msg.content + msg.attachments.map(attachment => attachment.url),
 
                       footer: {
 
@@ -92,8 +92,8 @@ module.exports = (client) => {
         
       }
 
-    })
+    });
 
   });
 
-}
+};

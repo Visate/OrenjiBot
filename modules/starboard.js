@@ -3,22 +3,24 @@ module.exports = (client) => {
   client.on("messageReactionAdd", (message, emoji, userID) => {
 
     client.getMessage(message.channel.id, message.id).then(msg => {
+    
+    let user = client.guilds.get(msg.channel.guild.id).members.get(userID);
 
-      if (client.guilds.get(msg.channel.guild.id).members.get(userID).roles.filter(role => {client.config.veteranRoleIDS.includes(role)})) {
+      if (user.roles.some(role => client.config.veteranRoleIDs.includes(role))) {
 
         if (msg.channel.guild.id === client.config.guildID) {
 
           if (msg.channel.id !== client.config.starboardChannelID) {
 
-            if (emoji.name === "⭐" && emoji.id === null) {
+            if (emoji.name === "⭐") {
 
               let db = client.getDatabase();
 
               // Open database and create starboard table if it does not exist
-              db.run("CREATE TABLE IF NOT EXISTS starboard (MessageId INTEGER)");
+              db.run("CREATE TABLE IF NOT EXISTS starboard (MessageId INTEGER)")
               
               // Check the database for the message id
-              db.get("SELECT MessageId FROM starboard WHERE MessageId = ?", message.id, (err, row) => {
+              .get("SELECT MessageId FROM starboard WHERE MessageId = ?", message.id, (err, row) => {
 
                 if (err) {
 
@@ -29,7 +31,7 @@ module.exports = (client) => {
                 // If the message id does not exist in the database, add it, and create a new post in starboard
                 if (row == null) {
 
-                  client.log(`Added message ${msg.id} from ${msg.member.username}#${msg.member.discriminator} to the starboard`);
+                  client.log(`${user.username}#${user.discriminator} added message ${msg.id} from ${msg.member.username}#${msg.member.discriminator} to starboard`);
 
                   client.createMessage(client.config.starboardChannelID, {
 
@@ -72,11 +74,22 @@ module.exports = (client) => {
 
               })
 
+              .close((err) => {
+
+                if (err) {
+
+                  client.error(`Failed to close database: ${err}`)
+
+                }
+
+              });
+
             }
 
           }
 
         }
+        
       }
 
     })

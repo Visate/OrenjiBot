@@ -16,71 +16,72 @@ module.exports = (client) => {
 
               let db = client.getDatabase();
 
-              // Open database and create starboard table if it does not exist
-              db.run("CREATE TABLE IF NOT EXISTS starboard (MessageId INTEGER)")
-              
-              // Check the database for the message id
-              .get("SELECT MessageId FROM starboard WHERE MessageId = ?", message.id, (err, row) => {
+              db.serialize(() => {
+                // Open database and create starboard table if it does not exist
+                db.run("CREATE TABLE IF NOT EXISTS starboard (MessageId INTEGER)")
+                
+                // Check the database for the message id
+                .get("SELECT MessageId FROM starboard WHERE MessageId = ?", message.id, (err, row) => {
 
-                if (err) {
+                  if (err) {
 
-                  client.error(`Failed to load starboard table: ${err}`);
+                    client.error(`Failed to load starboard table: ${err}`);
 
-                }
+                  }
 
-                // If the message id does not exist in the database, add it, and create a new post in starboard
-                if (row == null) {
+                  // If the message id does not exist in the database, add it, and create a new post in starboard
+                  if (row == null) {
 
-                  client.log(`${user.username}#${user.discriminator} added message ${msg.id} from ${msg.member.username}#${msg.member.discriminator} to starboard`);
+                    client.log(`${user.username}#${user.discriminator} added message ${msg.id} from ${msg.member.username}#${msg.member.discriminator} to starboard`);
 
-                  client.createMessage(client.config.starboardChannelID, {
+                    client.createMessage(client.config.starboardChannelID, {
 
-                    embed: {
+                      embed: {
 
-                      author: {
+                        author: {
 
-                        name: `${msg.member.username}#${msg.member.discriminator} (${userID})`,
-                        icon_url: msg.member.staticAvatarURL
+                          name: `${msg.member.username}#${msg.member.discriminator} (${userID})`,
+                          icon_url: msg.member.staticAvatarURL
 
-                      },
+                        },
 
-                      description: msg.content + msg.attachments.map(attachment => attachment.url),
+                        description: msg.content + msg.attachments.map(attachment => attachment.url),
 
-                      footer: {
+                        footer: {
 
-                        text: "⭐",
+                          text: "⭐",
 
-                      },
+                        },
 
-                      timestamp: new Date(),
-                      color: 16764928, // #FFD000, yellow
-                      type: "rich"
+                        timestamp: new Date(),
+                        color: 16764928, // #FFD000, yellow
+                        type: "rich"
 
-                    }
-                  
-                  }).catch((err) => client.error(`Failed to add post to starboard: ${err}`));
+                      }
+                    
+                    }).catch((err) => client.error(`Failed to add post to starboard: ${err}`));
 
-                  db.run("INSERT INTO starboard(MessageID) VALUES(?)", message.id, (err) => {
+                    db.run("INSERT INTO starboard(MessageID) VALUES(?)", message.id, (err) => {
 
-                    if (err) {
+                      if (err) {
 
-                      client.error(`Failed to add data to starboard table: ${err}`)
+                        client.error(`Failed to add data to starboard table: ${err}`);
 
-                    }
+                      }
 
-                  });
+                    }).close((err) => {
+                      
+                      if (err) {
+      
+                        client.error(`Failed to close database: ${err}`);
+      
+                      }
+      
+                    });
 
-                }
+                  }
 
-              })
-
-              .close((err) => {
-
-                if (err) {
-
-                  client.error(`Failed to close database: ${err}`)
-
-                }
+                });
 
               });
 

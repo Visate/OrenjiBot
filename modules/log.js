@@ -229,43 +229,65 @@ module.exports = (client) => {
 
     let db = client.getDatabase();
     
-    db.run("CREATE TABLE IF NOT EXISTS activityLog (userId INTEGER PRIMARY KEY, lastActivity TEXT NOT NULL)")
+    db.serialize(() => {
 
-    .get("SELECT userId id, lastActivity date FROM activityLog WHERE userId = ?", user.id, (err, row) => {
+      db.run("CREATE TABLE IF NOT EXISTS activityLog (userId INTEGER PRIMARY KEY, lastActivity TEXT NOT NULL)")
 
-      if (err) {
-        
-        client.error(`Failed to load activity log table: ${err}`);
-        
-      }
+      .get("SELECT userId id, lastActivity date FROM activityLog WHERE userId = ?", user.id, (err, row) => {
 
-      if (row == null) {
+        if (err) {
+          
+          client.error(`Failed to load activity log table: ${err}`);
+          
+        }
 
-        client.log(`Added new user ${user.username}#${user.discriminator} (${user.id}) to activity log`);
+        if (row == null) {
 
-        db.run("INSERT INTO activityLog(userId, lastActivity) VALUES (?, DATETIME('now'))", user.id, (err) => {
+          let db = client.getDatabase();
 
-          if (err) {
+          client.log(`Added new user ${user.username}#${user.discriminator} (${user.id}) to activity log`);
 
-            client.error(`Failed to add data to activity log table: ${err}`);
+          db.run("INSERT INTO activityLog(userId, lastActivity) VALUES (?, DATETIME('now'))", user.id, (err) => {
 
-          }
+            if (err) {
 
-        });
+              client.error(`Failed to add data to activity log table: ${err}`);
 
-      } else {
+            }
 
-        db.run("UPDATE activityLog SET lastActivity = DATETIME('now') WHERE userId = ?", user.id, (err) => {
-          client.log(`updated ${user.username}#${user.discriminator} (${user.id}) in activity log`);
-          if (err) {
+          }).close((err) => {
             
-            client.error(`Failed to update data in activity log table: ${err}`);
+            if (err) {
 
-          }
+              client.error(`Failed to close database: ${err}`);
 
-        });
-        
-      }
+            }
+
+          });
+
+        } else {
+
+          db.run("UPDATE activityLog SET lastActivity = DATETIME('now') WHERE userId = ?", user.id, (err) => {
+
+            if (err) {
+              
+              client.error(`Failed to update data in activity log table: ${err}`);
+
+            }
+
+          }).close((err) => {
+            
+            if (err) {
+
+              client.error(`Failed to close database: ${err}`);
+
+            }
+
+          });
+
+        }
+
+      });
 
     });
 

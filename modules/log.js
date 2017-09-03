@@ -231,8 +231,10 @@ module.exports = (client) => {
     
     db.serialize(() => {
 
+      // Create activity log table if it does not exist
       db.run("CREATE TABLE IF NOT EXISTS activityLog (userId INTEGER PRIMARY KEY, lastActivity TEXT NOT NULL)")
 
+      // Check the table for the user
       .get("SELECT userId id, lastActivity date FROM activityLog WHERE userId = ?", user.id, (err, row) => {
 
         if (err) {
@@ -240,7 +242,8 @@ module.exports = (client) => {
           client.error(`Failed to load activity log table: ${err}`);
           
         }
-
+ 
+        // Add new entry for a new user
         if (row == null) {
 
           let db = client.getDatabase();
@@ -264,7 +267,8 @@ module.exports = (client) => {
             }
 
           });
-
+        
+        // Update entry for existing user
         } else {
 
           db.run("UPDATE activityLog SET lastActivity = DATETIME('now') WHERE userId = ?", user.id, (err) => {

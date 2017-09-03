@@ -17,7 +17,8 @@ module.exports = (client) => {
               let db = client.getDatabase();
 
               db.serialize(() => {
-                // Open database and create starboard table if it does not exist
+
+                // Create starboard table if it does not exist
                 db.run("CREATE TABLE IF NOT EXISTS starboard (MessageId INTEGER)")
                 
                 // Check the database for the message id

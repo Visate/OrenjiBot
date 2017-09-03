@@ -1,8 +1,9 @@
 # Config
 config.json
 
-# starboard test files
-test
+# database test files
+*.sql
+*.db
 
 #VSC folder
 .vscode

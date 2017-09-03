@@ -60,7 +60,7 @@ module.exports = (client) => {
                   
                   }).catch((err) => client.error(`Failed to add post to starboard: ${err}`));
 
-                  db.run("INSERT INTO starboard(MessageID) VALUES (?)", message.id, (err) => {
+                  db.run("INSERT INTO starboard(MessageID) VALUES(?)", message.id, (err) => {
 
                     if (err) {
 

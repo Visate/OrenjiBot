@@ -208,4 +208,67 @@ module.exports = (client) => {
         
   });
 
+  // User activity logging
+  
+  // Message send logging
+  client.on("messageCreate", (msg) => {
+
+    updateUserActivity(msg.author);
+
+  });
+
+  //Voice channel join logging
+  client.on("voiceChannelJoin", (member) => {
+
+    updateUserActivity(member);
+
+  });
+
+  // Update activity log function
+  function updateUserActivity(user) {
+
+    let db = client.getDatabase();
+    
+    db.run("CREATE TABLE IF NOT EXISTS activityLog (userId INTEGER PRIMARY KEY, lastActivity TEXT NOT NULL)")
+
+    .get("SELECT userId id, lastActivity date FROM activityLog WHERE userId = ?", user.id, (err, row) => {
+
+      if (err) {
+        
+        client.error(`Failed to load activity log table: ${err}`);
+        
+      }
+
+      if (row == null) {
+
+        client.log(`Added new user ${user.username}#${user.discriminator} (${user.id}) to activity log`);
+
+        db.run("INSERT INTO activityLog(userId, lastActivity) VALUES (?, DATETIME('now'))", user.id, (err) => {
+
+          if (err) {
+
+            client.error(`Failed to add data to activity log table: ${err}`);
+
+          }
+
+        });
+
+      } else {
+
+        db.run("UPDATE activityLog SET lastActivity = DATETIME('now') WHERE userId = ?", user.id, (err) => {
+          client.log(`updated ${user.username}#${user.discriminator} (${user.id}) in activity log`);
+          if (err) {
+            
+            client.error(`Failed to update data in activity log table: ${err}`);
+
+          }
+
+        });
+        
+      }
+
+    });
+
+  }
+
 };
